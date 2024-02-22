@@ -1,3 +1,5 @@
+# Installing ActiveMQ
+
 ## Troubleshooting
 
 http://localhost:30010/ may not always open due to some sort of bug. To fix that, run a port forwarding in a Terminal window (keep it open):

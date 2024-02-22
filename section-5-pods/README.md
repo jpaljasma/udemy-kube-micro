@@ -1,4 +1,4 @@
-# Pods
+# Pods in Kubernetes
 
 https://kubernetes.io/docs/concepts/workloads/pods/
 
