@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  containers:
+  - name: mysql
+    image: mysql/mysql-server:8.0.23
+    imagePullPolicy: "IfNotPresent"
+    volumeMounts:
+    - name: mysql-initdb
+      mountPath: /docker-entrypoint-initdb.d
+    - name: config-volume
+      mountPath: /etc/mysql/conf.d
+    env:
+    - name: MYSQL_USER
+      value: user
+    # Use secret in real life
+    - name: MYSQL_ROOT_PASSWORD
+      value: password
+    - name: MYSQL_DATABASE
+      value: fleetman
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 200m
+      limits:
+        memory: 1000Mi
+        cpu: 400m
+  volumes:
+  - name: mysql-initdb
+    configMap:
+      name: mysql-initdb-config
+  - name: config-volume
+    configMap:
+      name: mysql-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS fleetman;
+    CREATE USER 'user' IDENTIFIED WITH mysql_native_password BY 'password';
+    GRANT ALL PRIVILEGES ON fleetman.* TO 'user';
+    FLUSH PRIVILEGES;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  my.cnf: |
+    [mysqld]
+    log-bin
+    character-set-server = utf8mb4
+    collation-server = utf8mb4_unicode_ci
+    default-storage-engine=INNODB
+    max_allowed_packet=128M
+    innodb_log_file_size=1GB
+    transaction-isolation=READ-COMMITTED
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: database
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+  # Service only accessible in a Kubernetes Cluster
+  type: ClusterIP

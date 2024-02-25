@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # Critical! Unique key for the service instance.
+  name: fleetman-webapp
+spec:
+  # Defines which Pod(s) are represented by this Service.
+  # The Service becomes a network endpoint for either other
+  # services or maybe external users to connect to (eg. browser)
+  selector:
+    # select all pods where the label key "app" matches "webapp"
+    app: webapp
+    tier: frontend
+    env: development
+
+  ports:
+  - name: http
+    port: 80
+    # NodePort needs to be greater than 30,000
+    # Think of it as a temporary development feature.
+    # For the Prod loads, you will use LoadBalancer
+    nodePort: 30080
+
+  # LoadBalancer dont work locally, only in some cloud providers
+  # type: LoadBalancer
+  # ClusterIP makes service work only within the cluster, and will not
+  # make service accessible publicly. Use it as internal service (microservice)
+  # NodePort exposes the ip address of the service to public
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  # Critical! Unique key for the service instance.
+  name: fleetman-queue
+spec:
+  selector:
+    app: queue
+
+  ports:
+  - name: http
+    port: 8161
+    nodePort: 30010
+
+  type: NodePort
