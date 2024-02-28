@@ -21,13 +21,13 @@ service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   3h33m
 
 ```
 
-```
+```bash
 % kubectl apply -f webapp-service.yaml
 
 service/fleetman-webapp created
 ```
 
-```
+```bash
 % kubectl get all
 
 NAME         READY   STATUS    RESTARTS   AGE
